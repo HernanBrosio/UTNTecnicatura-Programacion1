@@ -1,0 +1,41 @@
+{
+  "version": "2.0.0",
+  "tasks": [
+    {
+      "label": "C++: build active file",
+      "type": "shell",
+      "command": "g++",
+      "args": [
+        "-std=c++17",
+        "-Wall",
+        "-Wextra",
+        "-O0",
+        "-g",
+        "${file}",
+        "-o",
+        "${fileDirname}\\build\\${fileBasenameNoExtension}.exe"
+      ],
+      "options": {
+        "cwd": "${workspaceFolder}"
+      },
+      "group": {
+        "kind": "build",
+        "isDefault": true
+      },
+      "problemMatcher": ["$gcc"],
+      "detail": "Compila el archivo actual con MinGW-w64 (g++)"
+    },
+    {
+      "label": "C++: run active file",
+      "type": "shell",
+      "command": "${fileDirname}\\build\\${fileBasenameNoExtension}.exe",
+      "group": "none",
+      "dependsOn": ["C++: build active file"],
+      "presentation": {
+        "reveal": "always",
+        "panel": "shared",
+        "focus": false
+      }
+    }
+  ]
+}
