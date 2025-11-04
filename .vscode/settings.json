@@ -1,0 +1,10 @@
+{
+  "code-runner.runInTerminal": true,
+  "code-runner.saveFileBeforeRun": true,
+  "code-runner.clearPreviousOutput": true,
+  "files.associations": {
+    "*.embeddedhtml": "html",
+    "iostream": "cpp",
+    "ostream": "cpp"
+  }
+}
