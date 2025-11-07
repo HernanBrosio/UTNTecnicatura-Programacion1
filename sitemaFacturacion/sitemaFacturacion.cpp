@@ -17,41 +17,37 @@ struct Factura
     string numeroFactura;
     int clienteID;
     int productoSKU[10];
-    string productoNombre;
-    int productoCantidad;
-    float precioUnitario;
-    float precioTotal;
-    float facturaTotal;
-};
-
-struct Producto
-{
-    int productoSKU;
-    string productoNombre;
-    float productoPrecio;
-    int productoStock;
+    string productoNombre[10];
+    int productoCantidad[10];
+    float precioUnitario[10];
+    float precioTotalItem[10];
+    int cantidadItems = 0;
+    float facturaTotal = 0.0f;
 };
 
 void menuPrincipal();
 void menuClientes(Cliente clientes[], int &cantidadClientes);
-void menuFacturas(Factura facturas[], int &cantidadFacturas, Cliente clientes[], int cantidadClientes, Producto productos[], int cantidadProductos);
-void menuCierreCaja();
+void menuFacturas(Factura facturas[], int &cantidadFacturas, Cliente clientes[], int cantidadClientes);
+void menuCierreCaja(Factura facturas[], int &cantidadFacturas, Cliente clientes[], int cantidadClientes);
 void agregarCliente(Cliente clientes[], int &cantidadClientes);
 void listarCliente(Cliente clientes[], int cantidadClientes);
-void inventario(Producto productos[], int cantidadProductos);
-void ingresarFactura(Factura facturas[], int &cantidadFacturas, Cliente clientes[], int cantidadClientes, Producto productos[], int cantidadProductos);
-void listarFacturas(Factura facturas[], int cantidadFacturas, Cliente clientes[], int cantidadClientes, Producto productos[], int cantidadProductos);
-void cierreCaja(Factura facturas[], int cantidadFacturas, Cliente clientes[], int cantidadClientes, Producto productos[], int cantidadProductos);
+void ingresarFactura(Factura facturas[], int &cantidadFacturas, Cliente clientes[], int cantidadClientes);
+void listarFacturas(Factura facturas[], int cantidadFacturas, Cliente clientes[], int cantidadClientes);
+void cierreCaja(Factura facturas[], int cantidadFacturas, Cliente clientes[], int cantidadClientes);
+void totalVentaSesion(Factura facturas[], int cantidadFacturas);
+void facturaMayorImporte(Factura facturas[], int cantidadFacturas, Cliente clientes[], int cantidadClientes);
+void promedioFacturacion(Factura facturas[], int cantidadFacturas);
+void promedioProductos(Factura facturas[], int cantidadFacturas);
 
 int main()
 {
 
     menuPrincipal();
 }
+
 void menuPrincipal()
 {
     static Cliente clientes[100]{};
-    static Producto productos[10]{};
     static Factura facturas[100]{};
 
     static int cantidadClientes = 0;
@@ -82,7 +78,7 @@ void menuPrincipal()
             menuClientes(clientes, cantidadClientes);
             break;
         case 2:
-            menuFacturas(facturas, cantidadFacturas, clientes, cantidadClientes, productos, cantidadProductos);
+            menuFacturas(facturas, cantidadFacturas, clientes, cantidadClientes);
             break;
         case 3:
             cout << "Saliendo del sistema..." << endl;
@@ -128,8 +124,7 @@ void menuClientes(Cliente clientes[], int &cantidadClientes)
     }
 }
 
-
-void menuFacturas(Factura facturas[], int &cantidadFacturas, Cliente clientes[], int cantidadClientes, Producto productos[], int cantidadProductos)
+void menuFacturas(Factura facturas[], int &cantidadFacturas, Cliente clientes[], int cantidadClientes)
 {
     while (true)
     {
@@ -157,19 +152,19 @@ void menuFacturas(Factura facturas[], int &cantidadFacturas, Cliente clientes[],
         switch (opcion)
         {
         case 1:
-            ingresarFactura(facturas, cantidadFacturas, clientes, cantidadClientes, productos, cantidadProductos);
+            ingresarFactura(facturas, cantidadFacturas, clientes, cantidadClientes);
             break;
         case 2:
-            listarFacturas(facturas, cantidadFacturas, clientes, cantidadClientes, productos, cantidadProductos);
+            listarFacturas(facturas, cantidadFacturas, clientes, cantidadClientes);
             break;
         case 3:
-            menuCierreCaja();
+            menuCierreCaja(facturas, cantidadFacturas, clientes, cantidadClientes);
             break;
         }
     }
 }
 
-void menuCierreCaja()
+void menuCierreCaja(Factura facturas[], int &cantidadFacturas, Cliente clientes[], int cantidadClientes)
 {
     while (true)
     {
@@ -187,12 +182,28 @@ void menuCierreCaja()
         if (opcion < 1 || opcion > 5)
         {
             cout << "Opcion no valida" << endl;
-            menuCierreCaja();
+            menuCierreCaja(facturas, cantidadFacturas, clientes, cantidadClientes);
         }
 
         if (opcion == 5)
         {
             return;
+        }
+
+        switch (opcion)
+        {
+        case 1:
+            totalVentaSesion(facturas, cantidadFacturas);
+            break;
+        case 2:
+            facturaMayorImporte(facturas, cantidadFacturas, clientes, cantidadClientes);
+            break;
+        case 3:
+            promedioFacturacion(facturas, cantidadFacturas);
+            break;
+        case 4:
+            promedioProductos(facturas, cantidadFacturas);
+            break;
         }
     }
 }
@@ -240,21 +251,7 @@ void listarCliente(Cliente clientes[], int cantidadClientes)
     }
 }
 
-void inventario(Producto productos[], int cantidadProductos)
-{
-    productos[0] = {9901, "Teclado", 1000, 99};
-    productos[1] = {9902, "Mouse", 1500, 99};
-    productos[2] = {9903, "Monitor", 1000, 99};
-    productos[3] = {9904, "Notebook", 100000, 99};
-    productos[4] = {9905, "Webcam", 500, 99};
-    productos[5] = {9906, "Barra de sonido", 1100, 99};
-    productos[6] = {9907, "Estabilizador de tension", 100, 99};
-    productos[7] = {9908, "Soporte de monitor", 50, 99};
-    productos[8] = {9909, "Silla Gamer", 20000, 99};
-    productos[9] = {9010, "Mousepad", 20, 99};
-}
-
-void ingresarFactura(Factura facturas[], int &cantidadFacturas, Cliente clientes[], int cantidadClientes, Producto productos[], int cantidadProductos)
+void ingresarFactura(Factura facturas[], int &cantidadFacturas, Cliente clientes[], int cantidadClientes)
 {
     char continuar = 's';
     while (cantidadFacturas < 100 && (continuar == 's' || continuar == 'S'))
@@ -273,15 +270,35 @@ void ingresarFactura(Factura facturas[], int &cantidadFacturas, Cliente clientes
             cout << "ID: " << clientes[i].clienteID << " - Nombre: " << clientes[i].nombre << " " << clientes[i].apellido << endl;
         }
         cin >> facturas[cantidadFacturas].clienteID;
-        // Quiero que el usuario pueda ver los skus disponibles, quiero que lo ingrese y que si no existe le diga que no existe, quiero que luego ingrese la cantidad y que el precio unitario se cargue solo desde el inventario
-        char continuarProducto = 's';
-        while (continuarProducto == 's' || continuarProducto == 'S')
+
+        int items;
+        cout << "cuentas items desea agregar a la factura (maximo 10): " << endl;
+        cin >> items;
+        if (items < 1 || items > 10)
         {
-            // Mostrar productos disponibles A DESARROLLAR
-            cout << "Desea agregar otro producto a la factura? (s/n): ";
-            cin >> continuarProducto;
+            cout << "Cantidad de items no valida" << endl;
+            continue;
         }
-        
+
+        facturas[cantidadFacturas].cantidadItems = 0;
+        facturas[cantidadFacturas].facturaTotal = 0.0;
+
+        for (int i = 0; i < items; i++)
+        {
+            cout << "Ingrese el sku del producto: " << endl;
+            cin >> facturas[cantidadFacturas].productoSKU[i];
+            cout << "Ingrese el nombre del producto: " << endl;
+            cin >> facturas[cantidadFacturas].productoNombre[i];
+            cout << "Ingrese la cantidad del producto: " << endl;
+            cin >> facturas[cantidadFacturas].productoCantidad[i];
+            cout << "Ingrese el precio unitario del producto: " << endl;
+            cin >> facturas[cantidadFacturas].precioUnitario[i];
+            facturas[cantidadFacturas].precioTotalItem[i] = facturas[cantidadFacturas].productoCantidad[i] * facturas[cantidadFacturas].precioUnitario[i];
+            facturas[cantidadFacturas].facturaTotal += facturas[cantidadFacturas].precioTotalItem[i];
+        }
+
+        facturas[cantidadFacturas].cantidadItems = items;
+        cout << "El total de la factura es: " << facturas[cantidadFacturas].facturaTotal << endl;
         cantidadFacturas++;
         cout << "Factura ingresada exitosamente" << endl;
         cout << "Desea agregar otra factura? (s/n): ";
@@ -289,6 +306,142 @@ void ingresarFactura(Factura facturas[], int &cantidadFacturas, Cliente clientes
     }
 }
 
-void listarFacturas(Factura facturas[], int cantidadFacturas, Cliente clientes[], int cantidadClientes, Producto productos[], int cantidadProductos)
+void listarFacturas(Factura facturas[], int cantidadFacturas, Cliente clientes[], int cantidadClientes)
 {
+    if (cantidadFacturas == 0)
+    {
+        cout << "No hay facturas para mostrar." << endl;
+        return;
+    }
+    cout << "----LISTA DE FACTURAS (" << cantidadFacturas << ")----" << endl;
+    for (int i = 0; i < cantidadFacturas; i++)
+    {
+        cout << "Factura numero: " << facturas[i].numeroFactura << endl;
+        cout << "Dia: " << facturas[i].facturaDia << "/" << facturas[i].facturaMes << "/" << facturas[i].facturaAnio << endl;
+        cout << "Cliente: " << facturas[i].clienteID << endl;
+
+        for (int j = 0; j < facturas[i].cantidadItems; j++)
+        {
+            cout << "SKU " << facturas[i].productoSKU[j] << " - " << facturas[i].productoNombre[j] << " - " << facturas[i].productoCantidad[j] << " x $" << facturas[i].precioUnitario[j] << " = $" << facturas[i].precioTotalItem[j] << endl;
+        }
+        cout << "Total Factura: $" << facturas[i].facturaTotal << endl;
+        cout << "-----------------------------" << endl;
+    }
+}
+
+void totalVentaSesion(Factura facturas[], int cantidadFacturas)
+{
+    int dia, mes, anio;
+
+    cout << "selccione el dia de la factura: " << endl;
+    cin >> dia;
+    cout << "selccione el mes de la factura: " << endl;
+    cin >> mes;
+    cout << "selccione el anio de la factura: " << endl;
+    cin >> anio;
+
+    int total = 0;
+    for (int i = 0; i < cantidadFacturas; ++i)
+    {
+        if (facturas[i].facturaDia == dia && facturas[i].facturaMes == mes && facturas[i].facturaAnio == anio)
+        {
+            total += facturas[i].facturaTotal;
+        }
+    }
+    cout << "El total de la venta del dia seleccionado es: $" << total << endl;
+}
+
+void facturaMayorImporte(Factura facturas[], int cantidadFacturas, Cliente clientes[], int cantidadClientes)
+{
+    if (cantidadFacturas == 0)
+    {
+        cout << "No hay facturas para mostrar." << endl;
+        return;
+    }
+
+    int dia, mes, anio;
+
+    cout << "selccione el dia de la factura: " << endl;
+    cin >> dia;
+    cout << "selccione el mes de la factura: " << endl;
+    cin >> mes;
+    cout << "selccione el anio de la factura: " << endl;
+    cin >> anio;
+
+    int facturaMayorID = 0;
+    float facturaMayorImporte = 0;
+
+    for (int i = 0; i < cantidadFacturas; ++i)
+    {
+        if (facturas[i].facturaDia == dia &&
+            facturas[i].facturaMes == mes &&
+            facturas[i].facturaAnio == anio)
+        {
+            if (facturaMayorID == -1 || facturas[i].facturaTotal > facturaMayorImporte)
+            {
+                facturaMayorID = i;
+                facturaMayorImporte = facturas[i].facturaTotal;
+            }
+        }
+    }
+
+    if (facturaMayorID == -1)
+    {
+        cout << "No hay facturas para el " << dia << "/" << mes << "/" << anio << "." << endl;
+        return;
+    }
+
+    cout << "Factura de mayor importe del " << dia << "/" << mes << "/" << anio << endl;
+    cout << "  Numero: " << facturas[facturaMayorID].numeroFactura << endl;
+    cout << "  Cliente: " << facturas[facturaMayorID].clienteID << " - " << endl;
+    cout << "  Importe total: $" << facturaMayorImporte << endl;
+}
+
+void promedioFacturacion(Factura facturas[], int cantidadFacturas)
+{
+    int dia, mes, anio;
+
+    cout << "selccione el dia de la factura: " << endl;
+    cin >> dia;
+    cout << "selccione el mes de la factura: " << endl;
+    cin >> mes;
+    cout << "selccione el anio de la factura: " << endl;
+    cin >> anio;
+
+    float promedioFacturacionDiaria = 0;
+
+    for (int i = 0; i < cantidadFacturas; ++i)
+    {
+        if (facturas[i].facturaDia == dia &&
+            facturas[i].facturaMes == mes &&
+            facturas[i].facturaAnio == anio)
+        {
+            promedioFacturacionDiaria += facturas[i].facturaTotal;
+        }
+
+        promedioFacturacionDiaria /= cantidadFacturas;
+        cout << "El promedio de facturacion diaria es: $" << promedioFacturacionDiaria << endl;
+    }
+}
+
+void promedioProductos(Factura facturas[], int cantidadFacturas)
+{
+    string id;
+    cout << "selccione el numero de la factura: " << endl;
+    cin >> id;
+
+    for (int i = 0; i < cantidadFacturas; i++)
+    {
+        if (facturas[i].numeroFactura == id)
+        {
+            int totalUnidades = 0;
+
+            for (int j = 0; j < facturas[i].cantidadItems; j++)
+            {
+                totalUnidades += facturas[i].productoCantidad[j];
+            }
+            float promedio = totalUnidades / facturas[i].cantidadItems;
+            cout << "El promedio de unidades vendidas de la factura es: " << promedio << endl;
+        }
+    }
 }
